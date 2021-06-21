@@ -7,6 +7,7 @@ const { urlencoded } = require('body-parser')
 const flash = require('connect-flash')
 const session = require('express-session')
 const passport = require('./config/passport')
+const methodOverride = require('method-override')
 
 app.engine('hbs', exphbs({
   defaultLayout: 'main',
@@ -27,6 +28,8 @@ app.use((req, res, next) => {
   res.locals.user = req.user
   next()
 })
+
+app.use(methodOverride('_method'))
 
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}!`)
