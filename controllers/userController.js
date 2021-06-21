@@ -3,19 +3,20 @@ const db = require('../models')
 const { User } = db
 
 const userController = {
+
   signUpPage: (req, res) => {
     return res.render('signup')
   },
 
   signUp: (req, res) => {
     // confirm password
-    if(req.body.passwordCheck !== req.body.password){
+    if (req.body.passwordCheck !== req.body.password) {
       req.flash('error_messages', 'Password and confirm password do not match.')
       return res.redirect('/signup')
     } else {
       // confirm unique user
-      User.findOne({where: {email: req.body.email}}).then(user => {
-        if(user){
+      User.findOne({ where: { email: req.body.email } }).then(user => {
+        if (user) {
           req.flash('error_messages', 'This email already exists.')
           return res.redirect('/signup')
         } else {
@@ -26,11 +27,27 @@ const userController = {
           }).then(user => {
             req.flash('success_messages', 'You have successfully registered! Please log in.')
             return res.redirect('/signin')
-          })  
+          })
         }
-      })    
+      })
     }
+  },
+
+  signInPage: (req, res) => {
+    return res.render('signin')
+  },
+
+  signIn: (req, res) => {
+    req.flash('success_messages', 'Logged in successfully.')
+    res.redirect('/restaurants')
+  },
+
+  logout: (req, res) => {
+    req.flash('success_messages', 'Logged out successfully.')
+    req.logout()
+    res.redirect('/signin')
   }
+
 }
 
 module.exports = userController

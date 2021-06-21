@@ -2,6 +2,8 @@ const restController = require('../controllers/restController.js')
 const adminController = require('../controllers/adminController.js')
 const userController = require('../controllers/userController.js')
 
+const passport = require('../config/passport')
+
 module.exports = app => {
 
   //如果使用者訪問首頁，就導向 /restaurants 的頁面
@@ -16,4 +18,8 @@ module.exports = app => {
 
   app.get('/signup', userController.signUpPage)
   app.post('/signup', userController.signUp)
+  app.get('/signin', userController.signInPage)
+  // 先 Passport 做身份驗證，因此 userController.signIn 收到 request 時，就一定是登入後的使用者
+  app.post('/signin', passport.authenticate('local', { failureRedirect: '/signin', failureFlash: true }), userController.signIn)
+  app.get('/logout', userController.logout)
 }
