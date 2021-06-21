@@ -3,6 +3,9 @@ const exphbs = require('express-handlebars') // 引入 handlebars
 const db = require('./models')
 const app = express()
 const port = 3000
+const { urlencoded } = require('body-parser')
+
+app.use(urlencoded({ extended: true }))
 
 app.engine('hbs', exphbs({
   defaultLayout: 'main',
