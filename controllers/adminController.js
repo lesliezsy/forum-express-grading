@@ -1,8 +1,8 @@
 const db = require('../models')
 const { Restaurant } = db
-const fs = require('fs')
+// const fs = require('fs')
 const imgur = require('imgur-node-api')
-const IMGUR_CLIENT_ID = '5d1a0b467982077'
+const IMGUR_CLIENT_ID = process.env.IMGUR_CLIENT_ID
 
 const adminController = {
   getRestaurants: (req, res) => {
