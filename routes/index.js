@@ -1,3 +1,5 @@
+const helpers = require('../_helpers')
+
 const restController = require('../controllers/restController.js')
 const adminController = require('../controllers/adminController.js')
 const userController = require('../controllers/userController.js')
@@ -8,7 +10,7 @@ const upload = multer({ dest: 'temp/' }) // 指定上傳時的暫存資料夾（
 module.exports = (app, passport) => {
   // 身份驗證 - 判斷是否登入
   const authenticated = (req, res, next) => {
-    if (req.isAuthenticated()) {
+    if (helpers.ensureAuthenticated(req)) {
       return next()
     }
     // 沒登入
@@ -16,8 +18,10 @@ module.exports = (app, passport) => {
   }
   // 判斷是否具管理員身份
   const authenticatedAdmin = (req, res, next) => {
-    if (req.isAuthenticated()) {
-      if (req.user.isAdmin) { return next() }
+    // if (req.isAuthenticated()) 
+    if (helpers.ensureAuthenticated(req)) {
+      // if (req.user.isAdmin) 
+      if (helpers.getUser(req).isAdmin) { return next() }
       return res.redirect('/')
     }
     // 沒登入
