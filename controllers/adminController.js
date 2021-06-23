@@ -1,6 +1,8 @@
 const db = require('../models')
 const { Restaurant } = db
 const fs = require('fs')
+const imgur = require('imgur-node-api')
+const IMGUR_CLIENT_ID = '5d1a0b467982077'
 
 const adminController = {
   getRestaurants: (req, res) => {
@@ -20,23 +22,28 @@ const adminController = {
     const { file } = req // 從網頁傳來的req裡的 file（is a obj）專放圖片，body（is a obj）放文字內容
     // 若存在圖片類型檔案
     if (file) {
-      fs.readFile(file.path, (err, data) => {
-        if (err) console.log('Error: ', err) // 上傳失誤 
-        // 將圖檔正式寫入 upload 資料夾
-        fs.writeFile(`upload/${file.originalname}`, data, () => {
-          console.log("上傳的圖片： ", file);
-          return Restaurant.create({
-            name: req.body.name,
-            tel: req.body.tel,
-            address: req.body.address,
-            opening_hours: req.body.opening_hours,
-            description: req.body.description,
-            image: file ? `/upload/${file.originalname}` : null
-          }).then(() => {
-            req.flash('success_messages', 'Restaurant was successfully created')
-            return res.redirect('/admin/restaurants')
-          })
+      // 將圖檔直接上傳至 imgur
+      imgur.setClientID(IMGUR_CLIENT_ID);
+      imgur.upload(file.path, (err, img) => {
+
+        // fs.readFile(file.path, (err, data) => {
+        //   if (err) console.log('Error: ', err) // 上傳失誤 
+        //   // 將圖檔正式寫入 upload 資料夾
+        //   fs.writeFile(`upload/${file.originalname}`, data, () => {
+        //     console.log("上傳的圖片： ", file);
+        return Restaurant.create({
+          name: req.body.name,
+          tel: req.body.tel,
+          address: req.body.address,
+          opening_hours: req.body.opening_hours,
+          description: req.body.description,
+          image: file ? img.data.link : null
+          // image: file ? `/upload/${file.originalname}` : null
+        }).then((restaurant) => {
+          req.flash('success_messages', 'Restaurant was successfully created.')
+          return res.redirect('/admin/restaurants')
         })
+        // })
       })
     } else { // 若不存在圖檔
       return Restaurant.create({
@@ -46,8 +53,8 @@ const adminController = {
         opening_hours: req.body.opening_hours,
         description: req.body.description,
         image: null
-      }).then(() => {
-        req.flash('success_messages', 'Restaurant was successfully created')
+      }).then((restaurant) => {
+        req.flash('success_messages', 'Restaurant was successfully created.')
         return res.redirect('/admin/restaurants')
       })
     }
@@ -72,24 +79,28 @@ const adminController = {
 
     const { file } = req
     if (file) {
-      fs.readFile(file.path, (err, data) => {
-        if (err) console.log('Error: ', err)
-        fs.writeFile(`upload/${file.originalname}`, data, () => {
-          return Restaurant.findByPk(req.params.id)
-            .then((restaurant) => {
-              restaurant.update({
-                name: req.body.name,
-                tel: req.body.tel,
-                address: req.body.address,
-                opening_hours: req.body.opening_hours,
-                description: req.body.description,
-                image: file ? `/upload/${file.originalname}` : restaurant.image
-              }).then((restaurant) => {
-                req.flash('success_messages', 'Restaurant was updated successfully.')
-                res.redirect('/admin/restaurants')
-              })
+      // 將圖檔直接上傳至 imgur，成功後，http://img.data.link/ 會是剛剛上傳後拿到的圖片網址
+      imgur.setClientID(IMGUR_CLIENT_ID);
+      imgur.upload(file.path, (err, img) => {
+        // fs.readFile(file.path, (err, data) => {
+        //   if (err) console.log('Error: ', err)
+        //   fs.writeFile(`upload/${file.originalname}`, data, () => {
+        return Restaurant.findByPk(req.params.id)
+          .then((restaurant) => {
+            restaurant.update({
+              name: req.body.name,
+              tel: req.body.tel,
+              address: req.body.address,
+              opening_hours: req.body.opening_hours,
+              description: req.body.description,
+              image: file ? img.data.link : restaurant.image,
+              // image: file ? `/upload/${file.originalname}` : restaurant.image
+            }).then((restaurant) => {
+              req.flash('success_messages', 'Restaurant was updated successfully.')
+              res.redirect('/admin/restaurants')
             })
-        })
+          })
+        // })
       })
     } else {
       return Restaurant.findByPk(req.params.id)
