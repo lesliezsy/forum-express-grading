@@ -1,12 +1,14 @@
 const db = require('../models')
-const { Restaurant } = db
+const { Restaurant, Category } = db
 // const fs = require('fs')
 const imgur = require('imgur-node-api')
 const IMGUR_CLIENT_ID = process.env.IMGUR_CLIENT_ID
 
 const adminController = {
   getRestaurants: (req, res) => {
-    return Restaurant.findAll({ raw: true }).then(restaurants => {
+    // 撈出資料後，需用 { raw: true, nest: true } 轉換成 JS 原生物件
+    return Restaurant.findAll({ raw: true, nest: true, include: [Category] })
+    .then(restaurants => {
       return res.render('admin/restaurants', { restaurants })
     })
   },
@@ -61,8 +63,10 @@ const adminController = {
   },
   // 瀏覽單一餐廳
   getRestaurant: (req, res) => {
-    return Restaurant.findByPk(req.params.id, { raw: true }).then(restaurant => {
-      return res.render('admin/restaurant', { restaurant })
+    return Restaurant.findByPk(req.params.id, { include: [Category] })
+    .then(restaurant => {
+      // 只處理單筆資料時，用 .toJSON() 把 Sequelize 回傳的整包物件直接轉成 JSON 格式
+      return res.render('admin/restaurant', { restaurant: restaurant.toJSON() })
     })
   },
   editRestaurant: (req, res) => {
