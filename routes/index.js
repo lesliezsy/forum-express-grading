@@ -3,6 +3,7 @@ const helpers = require('../_helpers')
 const restController = require('../controllers/restController.js')
 const adminController = require('../controllers/adminController.js')
 const userController = require('../controllers/userController.js')
+const categoryController = require('../controllers/categoryController.js')
 
 const multer = require('multer')
 const upload = multer({ dest: 'temp/' }) // 指定上傳時的暫存資料夾（通常會定期清空）
@@ -45,6 +46,7 @@ module.exports = (app, passport) => {
   app.get('/admin/restaurants/:id/edit', authenticatedAdmin, adminController.editRestaurant)
   app.put('/admin/restaurants/:id', authenticatedAdmin, upload.single('image'), adminController.putRestaurant)
   app.delete('/admin/restaurants/:id', authenticatedAdmin, adminController.deleteRestaurant)
+  app.get('/admin/categories', authenticatedAdmin, categoryController.getCategories)
 
   app.get('/signup', userController.signUpPage)
   app.post('/signup', userController.signUp)
