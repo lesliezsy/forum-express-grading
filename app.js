@@ -17,7 +17,8 @@ const methodOverride = require('method-override')
 
 app.engine('hbs', exphbs({
   defaultLayout: 'main',
-  extname: '.hbs'
+  extname: '.hbs',
+  helpers: require('./config/handlebars-helpers')
 })) // Handlebars 註冊樣板引擎
 app.set('view engine', 'hbs') // 設定使用 Handlebars 做為樣板引擎
 
