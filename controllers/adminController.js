@@ -8,12 +8,19 @@ const adminController = {
   getRestaurants: (req, res) => {
     // 撈出資料後，需用 { raw: true, nest: true } 轉換成 JS 原生物件
     return Restaurant.findAll({ raw: true, nest: true, include: [Category] })
-    .then(restaurants => {
-      return res.render('admin/restaurants', { restaurants })
-    })
+      .then(restaurants => {
+        return res.render('admin/restaurants', { restaurants })
+      })
   },
   createRestaurant: (req, res) => {
-    return res.render('admin/create')
+    Category.findAll({
+      raw: true,
+      nest: true
+    }).then(categories => {
+      return res.render('admin/create', {
+        categories
+      })
+    })
   },
   postRestaurant: (req, res) => {
     // 餐廳名稱為必填，沒填的話會導回去新增餐廳的頁面
@@ -39,8 +46,9 @@ const adminController = {
           address: req.body.address,
           opening_hours: req.body.opening_hours,
           description: req.body.description,
-          image: file ? img.data.link : null
+          image: file ? img.data.link : null,
           // image: file ? `/upload/${file.originalname}` : null
+          CategoryId: req.body.categoryId
         }).then((restaurant) => {
           req.flash('success_messages', 'Restaurant was successfully created.')
           return res.redirect('/admin/restaurants')
@@ -54,7 +62,8 @@ const adminController = {
         address: req.body.address,
         opening_hours: req.body.opening_hours,
         description: req.body.description,
-        image: null
+        image: null,
+        CategoryId: req.body.categoryId
       }).then((restaurant) => {
         req.flash('success_messages', 'Restaurant was successfully created.')
         return res.redirect('/admin/restaurants')
@@ -64,14 +73,22 @@ const adminController = {
   // 瀏覽單一餐廳
   getRestaurant: (req, res) => {
     return Restaurant.findByPk(req.params.id, { include: [Category] })
-    .then(restaurant => {
-      // 只處理單筆資料時，用 .toJSON() 把 Sequelize 回傳的整包物件直接轉成 JSON 格式
-      return res.render('admin/restaurant', { restaurant: restaurant.toJSON() })
-    })
+      .then(restaurant => {
+        // 只處理單筆資料時，用 .toJSON() 把 Sequelize 回傳的整包物件直接轉成 JSON 格式
+        return res.render('admin/restaurant', { restaurant: restaurant.toJSON() })
+      })
   },
   editRestaurant: (req, res) => {
-    return Restaurant.findByPk(req.params.id, { raw: true }).then(restaurant => {
-      return res.render('admin/create', { restaurant })
+    Category.findAll({
+      raw: true,
+      nest: true
+    }).then(categories => {
+      return Restaurant.findByPk(req.params.id).then(restaurant => {
+        return res.render('admin/create', {
+          categories,
+          restaurant: restaurant.toJSON()
+        })
+      })
     })
   },
   // 更新編輯的餐廳資料
@@ -99,6 +116,7 @@ const adminController = {
               description: req.body.description,
               image: file ? img.data.link : restaurant.image,
               // image: file ? `/upload/${file.originalname}` : restaurant.image
+              CategoryId: req.body.categoryId
             }).then((restaurant) => {
               req.flash('success_messages', 'Restaurant was updated successfully.')
               res.redirect('/admin/restaurants')
@@ -114,7 +132,9 @@ const adminController = {
               tel: req.body.tel,
               address: req.body.address,
               opening_hours: req.body.opening_hours,
-              description: req.body.description
+              description: req.body.description,
+              image: restaurant.image,
+              CategoryId: req.body.categoryId
             })
             .then((restaurant) => {
               req.flash('success_messages', 'Restaurant was updated successfully.')
