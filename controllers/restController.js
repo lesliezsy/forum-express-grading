@@ -75,6 +75,30 @@ const restController = {
         restaurant: restaurant.toJSON()
       })
     })
+  },
+  getFeeds: (req, res) => {
+    // 兩個 promise 都執行完以後，才會進入 then，把資料回傳給前端
+    return Promise.all([
+      Restaurant.findAll({
+        limit: 10,
+        raw: true,
+        nest: true,
+        order: [['createdAt', 'DESC']],
+        include: [Category]
+      }),
+      Comment.findAll({
+        limit: 10,
+        raw: true,
+        nest: true,
+        order: [['createdAt', 'DESC']],
+        include: [User, Restaurant]
+      })
+    ]).then(([restaurants, comments]) => {
+      return res.render('feeds', {
+        restaurants,
+        comments
+      })
+    })
   }
 }
 module.exports = restController
