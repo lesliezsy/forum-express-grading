@@ -74,9 +74,7 @@ const restController = {
         { model: Comment, include: [User] }
       ]
     }).then(restaurant => {
-      // console.log(restaurant.Comments[0].dataValues)
       // 比對將這家餐廳加到最愛的人中，是否有目前 user
-      console.log("將這家餐廳加到最愛的人: ", restaurant.FavoritedUsers);
       const isFavorited = restaurant.FavoritedUsers.map(user => user.id).includes(req.user.id)
       return res.render('restaurant', {
         restaurant: restaurant.toJSON(),

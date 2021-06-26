@@ -19,7 +19,6 @@ const commentController = {
       .then((comment) => {
         comment.destroy()
           .then((comment) => {
-            console.log("comment: ", comment);
             res.redirect(`/restaurants/${comment.RestaurantId}`)
           })
       })
