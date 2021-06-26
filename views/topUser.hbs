@@ -16,8 +16,9 @@
   {{#each users}}
   <div class="col-3">
     <a href="/users/{{this.id}}">
-      <img class="mb-2" src="{{this.image}}" width="140px" height="140px">
+      <img class="rounded mb-2" src="{{this.image}}" alt="Avatar" width="140px" height="140px" style="object-fit: cover;">
     </a>
+
     <h5>{{this.name}}</h5>
     <span class="badge badge-secondary">追蹤人數：{{this.FollowerCount}}</span>
     <p>

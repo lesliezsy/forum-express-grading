@@ -1,6 +1,8 @@
 const bcrypt = require('bcryptjs')
 const db = require('../models')
 const { User, Favorite, Followship } = db
+const imgur = require('imgur-node-api')
+const IMGUR_CLIENT_ID = process.env.IMGUR_CLIENT_ID
 
 const userController = {
 
@@ -42,6 +44,66 @@ const userController = {
     req.flash('success_messages', 'Logged out successfully.')
     req.logout()
     res.redirect('/signin')
+  },
+  getUser: (req, res) => {
+    // 找到 user info, 傳到前端
+    User.findOne({
+        where: {
+          id: req.params.id
+        }
+      })
+      .then((user) => {
+        return res.render('profile', {
+          user: user.toJSON(),
+          self: req.user.id
+        })
+      })
+  },
+  editUser: (req, res) => {
+    User.findOne({
+        where: {
+          id: req.user.id
+        }
+      })
+      .then((user) => {
+        console.log("使用者資料： ", user);
+        return res.render('profileEdit', {
+          user: user.toJSON(),
+        })
+      })
+  },
+  putUser: (req, res) => {
+    const { file } = req
+    // 若有上傳圖檔
+    if (file) {
+      imgur.setClientID(IMGUR_CLIENT_ID);
+      imgur.upload(file.path, (err, img) => {
+        return User.findByPk(req.params.id)
+          .then((user) => {
+            console.log("上傳圖，更新的user info: ", user);
+            user.update({
+              name: req.body.name,
+              image: file ? img.data.link : user.image,
+            }).then((user) => {
+              req.flash('success_messages', "Your info was updated successfully.")
+              res.redirect(`/users/${req.params.id}`)
+            })
+          })
+      })
+    } else { // 若不存在圖檔
+      return User.findByPk(req.params.id)
+        .then((user) => {
+          console.log("不上傳圖，更新的user info: ", user);
+          user.update({
+              name: req.body.name,
+              image: user.image,
+            })
+            .then((user) => {
+              req.flash('success_messages', 'Your info was updated successfully.')
+              res.redirect(`/users/${req.params.id}`)
+            })
+        })
+    }
   },
   addFavorite: (req, res) => {
     return Favorite.create({

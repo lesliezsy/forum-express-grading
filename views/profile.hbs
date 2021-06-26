@@ -1,0 +1,12 @@
+<div class="card">
+  <div class="card-body">
+    <img src="{{user.image}}" class="rounded float-start" alt="Avatar" 
+    style="width: 300px; height: 300px; object-fit: cover;">
+  <h5 class="mt-3">{{user.name}}</h5>
+  <span>{{user.email}}</span>
+
+  {{#ifCond user.id self}}
+  <a class="btn btn-primary" href="/users/{{user.id}}/edit" role="button">Edit</a>
+  {{/ifCond}}
+</div>
+</div>
