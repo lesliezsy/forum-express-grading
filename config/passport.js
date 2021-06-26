@@ -2,7 +2,7 @@ const passport = require('passport')
 const LocalStrategy = require('passport-local')
 const bcrypt = require('bcryptjs')
 const db = require('../models')
-const { User } = db
+const { User, Restaurant } = db
 
 // setup passport strategy
 passport.use(new LocalStrategy(
@@ -27,7 +27,12 @@ passport.serializeUser((user, cb) => {
   cb(null, user.id)
 })
 passport.deserializeUser((id, cb) => {
-  User.findByPk(id).then(user => {
+  User.findByPk(id, {
+    include: [
+      { model: Restaurant, as: 'FavoritedRestaurants' } // 取出這位 User最愛餐廳資料
+      // 透過 Favorite, 查找 Restaurant 裡這位 User id liked 的餐廳資料
+    ]
+  }).then(user => {
     user = user.toJSON() // 此處與影片示範不同
     return cb(null, user)
   })

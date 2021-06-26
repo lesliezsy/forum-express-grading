@@ -43,7 +43,10 @@ const restController = {
         const data = result.rows.map(restaurant => ({
           ...restaurant,
           description: restaurant.description.substring(0, 50),
-          categoryName: restaurant.Category.name
+          categoryName: restaurant.Category.name,
+          // 比對db的餐廳是否已加入user的我的最愛
+          // 先取出user最愛餐廳的id 再去比對 db所有餐廳資料，最後回傳布林值
+          isFavorited: req.user.FavoritedRestaurants.map(d => d.id).includes(restaurant.id)
         }))
         // restaurant.Category.name 可以這樣用是因為在 restaurant model 裡有設關聯性
         Category.findAll({
@@ -67,12 +70,17 @@ const restController = {
     return Restaurant.findByPk(req.params.id, {
       include: [
         Category,
+        { model: User, as: 'FavoritedUsers' }, // 加入關聯資料: 拿到喜歡這間餐廳的 users 資料
         { model: Comment, include: [User] }
       ]
     }).then(restaurant => {
       // console.log(restaurant.Comments[0].dataValues)
+      // 比對將這家餐廳加到最愛的人中，是否有目前 user
+      console.log("將這家餐廳加到最愛的人: ", restaurant.FavoritedUsers);
+      const isFavorited = restaurant.FavoritedUsers.map(user => user.id).includes(req.user.id)
       return res.render('restaurant', {
-        restaurant: restaurant.toJSON()
+        restaurant: restaurant.toJSON(),
+        isFavorited: isFavorited
       })
     })
   },
@@ -83,14 +91,18 @@ const restController = {
         limit: 10,
         raw: true,
         nest: true,
-        order: [['createdAt', 'DESC']],
+        order: [
+          ['createdAt', 'DESC']
+        ],
         include: [Category]
       }),
       Comment.findAll({
         limit: 10,
         raw: true,
         nest: true,
-        order: [['createdAt', 'DESC']],
+        order: [
+          ['createdAt', 'DESC']
+        ],
         include: [User, Restaurant]
       })
     ]).then(([restaurants, comments]) => {
