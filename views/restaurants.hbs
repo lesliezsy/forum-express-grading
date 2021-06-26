@@ -1,24 +1,23 @@
 <ul class="nav nav-tabs mb-4">
- <li class="nav-item">
-   <a class="nav-link active" href="#">首頁</a>
- </li>
- <li class="nav-item">
-   <a class="nav-link" href="/restaurants/feeds">最新動態</a>
- </li>
+  <li class="nav-item">
+    <a class="nav-link active" href="#">首頁</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" href="/restaurants/feeds">最新動態</a>
+  </li>
 </ul>
-
 
 <ul class="nav nav-pills mb-3">
   <li class="nav-item">
     <a class="nav-link {{#ifCond '' categoryId}}active{{/ifCond}}" href="?categoryId=">全部</a>
   </li>
   {{#each categories}}
-    <li class="nav-item">
-      <a class="nav-link {{#ifCond this.id ../categoryId}}active{{/ifCond}}" href="?categoryId={{this.id}}">{{this.name}}</a>
-    </li>
+  <li class="nav-item">
+    <a class="nav-link {{#ifCond this.id ../categoryId}}active{{/ifCond}}"
+      href="?categoryId={{this.id}}">{{this.name}}</a>
+  </li>
   {{/each}}
 </ul>
-
 
 <div class="row">
   {{#each restaurants}}
@@ -33,6 +32,11 @@
         </p>
         <span class="badge badge-secondary">{{this.categoryName}}</span>
         <p class="card-text">{{this.description}}</p>
+        {{!-- 按鈕上的 this.id 因位在 #each restaurants 的作用域裡，所以會取到餐廳 id --}}
+        <form action="/favorite/{{this.id}}?_method=DELETE" method="POST"><button type="submit"
+            class="btn btn-danger">移除最愛</button></form>
+        <form action="/favorite/{{this.id}}" method="POST"><button type="submit" class="btn btn-primary">加到最愛</button>
+        </form>
       </div>
     </div>
   </div>
@@ -47,16 +51,17 @@
       </a>
     </li>
     {{#each totalPage}}
-      {{#ifCond this ../page}}
-        <li class="page-item active"><a class="page-link" href="#">{{this}}</a></li>
+    {{#ifCond this ../page}}
+    <li class="page-item active"><a class="page-link" href="#">{{this}}</a></li>
     {{else}}
-      <li class="page-item"><a class="page-link"
-          href="/restaurants?page={{this}}&categoryId={{../categoryId}}">{{this}}</a></li>
-      {{/ifCond}}
+    <li class="page-item"><a class="page-link"
+        href="/restaurants?page={{this}}&categoryId={{../categoryId}}">{{this}}</a></li>
+    {{/ifCond}}
     {{/each}}
-      <li class="page-item"><a class="page-link" href="/restaurants?page={{next}}&categoryId={{categoryId}}" aria-label="Next">
-      <span aria-hidden="true">&raquo;</span>
-    </a>
+    <li class="page-item"><a class="page-link" href="/restaurants?page={{next}}&categoryId={{categoryId}}"
+        aria-label="Next">
+        <span aria-hidden="true">&raquo;</span>
+      </a>
     </li>
   </ul>
 </nav>

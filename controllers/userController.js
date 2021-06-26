@@ -1,13 +1,12 @@
 const bcrypt = require('bcryptjs')
 const db = require('../models')
-const { User } = db
+const { User, Favorite } = db
 
 const userController = {
 
   signUpPage: (req, res) => {
     return res.render('signup')
   },
-
   signUp: (req, res) => {
     // confirm password
     if (req.body.passwordCheck !== req.body.password) {
@@ -32,20 +31,40 @@ const userController = {
       })
     }
   },
-
   signInPage: (req, res) => {
     return res.render('signin')
   },
-
   signIn: (req, res) => {
     req.flash('success_messages', 'Logged in successfully.')
     res.redirect('/restaurants')
   },
-
   logout: (req, res) => {
     req.flash('success_messages', 'Logged out successfully.')
     req.logout()
     res.redirect('/signin')
+  },
+  addFavorite: (req, res) => {
+    return Favorite.create({
+        UserId: req.user.id,
+        RestaurantId: req.params.restaurantId
+      })
+      .then((restaurant) => {
+        return res.redirect('back')
+      })
+  },
+  removeFavorite: (req, res) => {
+    return Favorite.findOne({
+        where: {
+          UserId: req.user.id,
+          RestaurantId: req.params.restaurantId
+        }
+      })
+      .then((favorite) => {
+        favorite.destroy()
+          .then((restaurant) => {
+            return res.redirect('back')
+          })
+      })
   }
 
 }
