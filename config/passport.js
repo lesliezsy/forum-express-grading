@@ -29,8 +29,10 @@ passport.serializeUser((user, cb) => {
 passport.deserializeUser((id, cb) => {
   User.findByPk(id, {
     include: [
-      { model: Restaurant, as: 'FavoritedRestaurants' } // 取出這位 User最愛餐廳資料
+      { model: Restaurant, as: 'FavoritedRestaurants' }, // 取出這位 User最愛餐廳資料
       // 透過 Favorite, 查找 Restaurant 裡這位 User id liked 的餐廳資料
+      { model: User, as: 'Followers' },  // 取出 user 正被誰 follow 的名單
+      { model: User, as: 'Followings' } // 取出 user 正在 follow 誰的名單
     ]
   }).then(user => {
     user = user.toJSON() // 此處與影片示範不同
