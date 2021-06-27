@@ -66,7 +66,6 @@ const userController = {
         }
       })
       .then((user) => {
-        console.log("使用者資料： ", user);
         return res.render('profileEdit', {
           user: user.toJSON(),
         })
