@@ -2,7 +2,7 @@ const helpers = require('../_helpers')
 
 const bcrypt = require('bcryptjs')
 const db = require('../models')
-const { User, Favorite, Followship } = db
+const { User, Favorite, Followship, Restaurant, Comment } = db
 const imgur = require('imgur-node-api')
 const IMGUR_CLIENT_ID = process.env.IMGUR_CLIENT_ID
 
@@ -48,11 +48,19 @@ const userController = {
     res.redirect('/signin')
   },
   getUser: (req, res) => {
-    // 找到 user info, 傳到前端
-    User.findOne({
-        where: {
-          id: req.params.id
-        }
+    // 找到 user info 以及 他的評論 傳到前端
+    // 透過評論，利用 RestaurantId 去找到 Restaurant info
+    User.findByPk(req.params.id, {
+        include: [{
+          model: Comment,
+          include: [{
+            model: Restaurant,
+            attributes: ['id', 'name', 'image'],
+          }],
+          order: [
+            ['createdAt', 'DESC']
+          ], // 按照評論產生時間新到舊排序
+        }],
       })
       .then((user) => {
         return res.render('profile', {

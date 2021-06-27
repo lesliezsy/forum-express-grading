@@ -82,6 +82,7 @@ const restController = {
       })
     })
   },
+  // 拿到最新動態
   getFeeds: (req, res) => {
     // 兩個 promise 都執行完以後，才會進入 then，把資料回傳給前端
     return Promise.all([
