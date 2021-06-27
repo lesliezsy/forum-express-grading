@@ -1,3 +1,5 @@
+const helpers = require('../_helpers')
+
 const bcrypt = require('bcryptjs')
 const db = require('../models')
 const { User, Favorite, Followship } = db
@@ -55,18 +57,17 @@ const userController = {
       .then((user) => {
         return res.render('profile', {
           user: user.toJSON(),
-          self: req.user.id
+          self: helpers.getUser(req).id
         })
       })
   },
   editUser: (req, res) => {
     User.findOne({
         where: {
-          id: req.user.id
+          id: helpers.getUser(req).id
         }
       })
       .then((user) => {
-        console.log("使用者資料： ", user);
         return res.render('profileEdit', {
           user: user.toJSON(),
         })
@@ -93,7 +94,7 @@ const userController = {
     } else { // 若不存在圖檔
       return User.findByPk(req.params.id)
         .then((user) => {
-          console.log("不上傳圖，更新的user info: ", user);
+          // console.log("不上傳圖，更新的user info: ", user);
           user.update({
               name: req.body.name,
               image: user.image,
@@ -107,7 +108,7 @@ const userController = {
   },
   addFavorite: (req, res) => {
     return Favorite.create({
-        UserId: req.user.id,
+        UserId: helpers.getUser(req).id,
         RestaurantId: req.params.restaurantId
       })
       .then((restaurant) => {
@@ -117,7 +118,7 @@ const userController = {
   removeFavorite: (req, res) => {
     return Favorite.findOne({
         where: {
-          UserId: req.user.id,
+          UserId: helpers.getUser(req).id,
           RestaurantId: req.params.restaurantId
         }
       })
@@ -135,22 +136,23 @@ const userController = {
         { model: User, as: 'Followers' }
       ]
     }).then(users => {
+      const self = helpers.getUser(req).id
       // 整理 users 資料
       users = users.map(user => ({
         ...user.dataValues,
         // 計算追蹤者人數
         FollowerCount: user.Followers.length,
         // 判斷目前登入使用者是否已追蹤該 User 物件
-        isFollowed: req.user.Followings.map(follower => follower.id).includes(user.id)
+        isFollowed: helpers.getUser(req).Followings.map(follower => follower.id).includes(user.id)
       }))
       // 依追蹤者人數排序清單
       users = users.sort((a, b) => b.FollowerCount - a.FollowerCount)
-      return res.render('topUser', { users })
+      return res.render('topUser', { users, self })
     })
   },
   addFollowing: (req, res) => {
     return Followship.create({
-        followerId: req.user.id,
+        followerId: helpers.getUser(req).id,
         followingId: req.params.userId
       })
       .then((followship) => {
@@ -160,7 +162,7 @@ const userController = {
   removeFollowing: (req, res) => {
     return Followship.findOne({
         where: {
-          followerId: req.user.id,
+          followerId: helpers.getUser(req).id,
           followingId: req.params.userId
         }
       })

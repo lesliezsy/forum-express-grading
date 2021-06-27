@@ -16,19 +16,26 @@
   {{#each users}}
   <div class="col-3">
     <a href="/users/{{this.id}}">
-      <img class="rounded mb-2" src="{{this.image}}" alt="Avatar" width="140px" height="140px" style="object-fit: cover;">
+      <img class="rounded mb-2" src="{{this.image}}" alt="Avatar" width="140px" height="140px"
+        style="object-fit: cover;">
     </a>
 
     <h5>{{this.name}}</h5>
     <span class="badge badge-secondary">追蹤人數：{{this.FollowerCount}}</span>
     <p>
+      {{!-- 如果是自己就不能追蹤 --}}
+      {{#ifCond this.id ../self}} {{else}}
+
       {{#if this.isFollowed }}
     <form action="/following/{{this.id}}?_method=DELETE" method="POST" style="display: contents;"><button type="submit"
         class="btn btn-danger">取消追蹤</button></form>
     {{else}}
+
     <form action="/following/{{this.id}}" method="POST" style="display: contents;"><button type="submit"
         class="btn btn-primary">追蹤</button></form>
     {{/if}}
+
+    {{/ifCond}}
     </p>
   </div>
   {{/each}}
