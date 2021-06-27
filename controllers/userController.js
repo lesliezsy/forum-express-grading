@@ -81,7 +81,7 @@ const userController = {
       imgur.upload(file.path, (err, img) => {
         return User.findByPk(req.params.id)
           .then((user) => {
-            console.log("上傳圖，更新的user info: ", user);
+            // console.log("上傳圖，更新的user info: ", user);
             user.update({
               name: req.body.name,
               image: file ? img.data.link : user.image,
