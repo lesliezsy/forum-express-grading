@@ -2,7 +2,7 @@ const helpers = require('../_helpers')
 
 const bcrypt = require('bcryptjs')
 const db = require('../models')
-const { User, Favorite, Followship, Restaurant, Comment } = db
+const { User, Favorite, Followship, Restaurant, Comment, Like } = db
 const imgur = require('imgur-node-api')
 const IMGUR_CLIENT_ID = process.env.IMGUR_CLIENT_ID
 
@@ -180,7 +180,30 @@ const userController = {
             return res.redirect('back')
           })
       })
-  }
+  },
+  addLike: (req, res) => {
+    return Like.create({
+        UserId: helpers.getUser(req).id,
+        RestaurantId: req.params.restaurantId
+      })
+      .then((restaurant) => {
+        return res.redirect('back')
+      })
+  },
+  removeLike: (req, res) => {
+    return Like.findOne({
+        where: {
+          UserId: helpers.getUser(req).id,
+          RestaurantId: req.params.restaurantId
+        }
+      })
+      .then((like) => {
+        like.destroy()
+          .then((restaurant) => {
+            return res.redirect('back')
+          })
+      })
+  },
 
 }
 

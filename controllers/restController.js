@@ -1,6 +1,7 @@
 // 負責處理前台餐廳相關
 const db = require('../models')
 const { Restaurant, Category, Comment, User } = db
+const helpers = require('../_helpers')
 
 const pageLimit = 10 // 一頁有 10 筆資料
 
@@ -31,7 +32,6 @@ const restController = {
       })
       .then(result => {
         // data for pagination
-
         // 第一次進入首頁時，沒帶任何參數，req.query.page 會回傳 undefined
         // 如果 || 左邊的運算結果是 false 或 undefined，就會拿到 || 右邊的值
         const page = Number(req.query.page) || 1
@@ -46,7 +46,8 @@ const restController = {
           categoryName: restaurant.Category.name,
           // 比對db的餐廳是否已加入user的我的最愛
           // 先取出user最愛餐廳的id 再去比對 db所有餐廳資料，最後回傳布林值
-          isFavorited: req.user.FavoritedRestaurants.map(d => d.id).includes(restaurant.id)
+          isFavorited: helpers.getUser(req).FavoritedRestaurants.map(d => d.id).includes(restaurant.id),
+          isLiked: helpers.getUser(req).LikedRestaurants.map(d => d.id).includes(restaurant.id)
         }))
         // restaurant.Category.name 可以這樣用是因為在 restaurant model 裡有設關聯性
         Category.findAll({
@@ -71,14 +72,18 @@ const restController = {
       include: [
         Category,
         { model: User, as: 'FavoritedUsers' }, // 加入關聯資料: 拿到喜歡這間餐廳的 users 資料
+        { model: User, as: 'UsersLiked' },
         { model: Comment, include: [User] }
       ]
     }).then(restaurant => {
       // 比對將這家餐廳加到最愛的人中，是否有目前 user
-      const isFavorited = restaurant.FavoritedUsers.map(user => user.id).includes(req.user.id)
+      const isFavorited = restaurant.FavoritedUsers.map(user => user.id).includes(helpers.getUser(req).id)
+      const isLiked = restaurant.UsersLiked.map(user => user.id).includes(helpers.getUser(req).id)
+
       return res.render('restaurant', {
         restaurant: restaurant.toJSON(),
-        isFavorited: isFavorited
+        isFavorited,
+        isLiked
       })
     })
   },
