@@ -8,24 +8,24 @@ const routes = require('../routes/index')
 const db = require('../models')
 const helpers = require('../_helpers');
 
-describe('# A19: 建立 User Profile', function() {
+describe('# A17: 使用者權限管理', function() {
     
-  context('# [瀏覽 Profile]', () => {
+  context('# [顯示使用者清單]', () => {
     before(async() => {
       this.ensureAuthenticated = sinon.stub(
         helpers, 'ensureAuthenticated'
       ).returns(true);
       this.getUser = sinon.stub(
         helpers, 'getUser'
-      ).returns({id: 1, Followings: []});
+      ).returns({id: 1, isAdmin: true});
 
       await db.User.destroy({where: {},truncate: true})
       await db.User.create({name: 'User1'})
     })
 
-    it(" GET /users/:id ", (done) => {
+    it(" GET /admin/users ", (done) => {
         request(app)
-          .get('/users/1')
+          .get('/admin/users')
           .end(function(err, res) {
             res.text.should.include('User1')
             done()
@@ -40,28 +40,29 @@ describe('# A19: 建立 User Profile', function() {
 
   })
 
-  context('# [瀏覽編輯 Profile 頁面]', () => {
+  context('# [修改使用者權限]', () => {
     before(async() => {
       this.ensureAuthenticated = sinon.stub(
         helpers, 'ensureAuthenticated'
       ).returns(true);
       this.getUser = sinon.stub(
         helpers, 'getUser'
-      ).returns({id: 1});
+      ).returns({id: 1, isAdmin: true});
 
       await db.User.destroy({where: {},truncate: true})
-      await db.User.create({name: 'User1'})
+      await db.User.create({name: 'User1', isAdmin: false})
     })
 
-    it(" GET /users/:id/edit ", (done) => {
+    it(" PUT /admin/users/:id/toggleAdmin ", (done) => {
         db.User.findByPk(1).then(user => {
           user.isAdmin.should.equal(false);
           request(app)
-            .get('/users/1/edit')
+            .put('/admin/users/1/toggleAdmin')
+            .type("form")
             .end(function(err, res) {
-              res.text.should.include('form')
               db.User.findByPk(1).then(user => {
                 user.name.should.equal('User1');
+                user.isAdmin.should.equal(true);
                 return done();
               })
           });
@@ -75,39 +76,4 @@ describe('# A19: 建立 User Profile', function() {
     })
 
   })
-
-  context('# [編輯 Profile]', () => {
-    before(async() => {
-      this.ensureAuthenticated = sinon.stub(
-        helpers, 'ensureAuthenticated'
-      ).returns(true);
-      this.getUser = sinon.stub(
-        helpers, 'getUser'
-      ).returns({id: 1});
-
-      await db.User.destroy({where: {},truncate: true})
-      await db.User.create({name: 'User1'})
-    })
-
-    it(" PUT /users/:id ", (done) => {
-      request(app)
-        .put('/users/1')
-        .type("form")
-        .send({name: 'User1User1'})
-        .end(function(err, res) {
-          db.User.findByPk(1).then(user => {
-            user.name.should.equal('User1User1');
-            return done();
-          })
-      });
-    });
-
-    after(async () => {
-      this.ensureAuthenticated.restore();
-      this.getUser.restore();
-      await db.User.destroy({where: {},truncate: true})
-    })
-
-  })
-
 })
