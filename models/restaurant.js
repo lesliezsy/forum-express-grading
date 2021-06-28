@@ -22,6 +22,12 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: 'RestaurantId', // 透過固定 RestaurantId 這欄位去取得 User 內符合條件的users (會拿到和這間餐廳有關係的 UserId)
         as: 'FavoritedUsers' // 改 RestaurantId 稱為 FavoritedUsers
       })
+
+      Restaurant.belongsToMany(models.User, {
+        through: models.Like, // 透過 Likes model 去查找餐廳與 user 之關聯
+        foreignKey: 'RestaurantId', // 透過固定 RestaurantId 這欄位去取得 User 內符合條件的 users (會拿到和這間餐廳有關係的 UserId)
+        as: 'UsersLiked' 
+      })
     }
   };
   Restaurant.init({
