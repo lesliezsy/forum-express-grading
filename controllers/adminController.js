@@ -159,17 +159,13 @@ const adminController = {
   toggleAdmin: (req, res) => {
     return User.findByPk(req.params.id)
       .then(user => {
-        console.log("前端傳來User資料： ", user);
         // 把User的 isAdmin value設為相反
         user.update({
           isAdmin: !user.isAdmin,
         }).then((user) => {
-          console.log("User更新後資料：", user);
           req.flash('success_messages', "Changed successfully.")
           return res.redirect('/admin/users')
         })
-
-      
       })
   },
 
