@@ -21,7 +21,7 @@
     </a>
 
     <h5>{{this.name}}</h5>
-    <span class="badge badge-secondary">追蹤人數：{{this.FollowerCount}}</span>
+    <span class="badge bg-secondary rounded-pill">追蹤人數：{{this.FollowerCount}}</span>
     <p>
       {{!-- 如果是自己就不能追蹤 --}}
       {{#ifCond this.id ../self}} {{else}}
