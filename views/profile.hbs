@@ -25,11 +25,10 @@
   <div class="card-body row d-flex justify-content-around">
 
     {{#each user.Comments}}
-    <div class="card col-4 col-sm-3 mb-2 mr-3" style="width: 10rem; height: 10rem">
-      <a href="/restaurants/{{this.Restaurant.id}}" class="text-decoration-none">
+    <div class="card col-4 col-sm-3 mb-2 mr-3" style="width: 10rem;">
+      <a href="/restaurants/{{this.Restaurant.id}}" class="text-decoration-none" data-bs-toggle="tooltip" title="{{this.Restaurant.name}}">
         <div class="card-body py-1 px-1 text-center">
           <img src="{{this.Restaurant.image}}" class="rounded img-fluid" style="object-fit: cover;">
-          <span class="text-muted">{{this.Restaurant.name}}</span>
         </div>
       </a>
     </div>
