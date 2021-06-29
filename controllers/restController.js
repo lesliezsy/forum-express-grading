@@ -67,25 +67,33 @@ const restController = {
 
       })
   },
-  getRestaurant: (req, res) => {
-    return Restaurant.findByPk(req.params.id, {
-      include: [
-        Category,
-        { model: User, as: 'FavoritedUsers' }, // 加入關聯資料: 拿到喜歡這間餐廳的 users 資料
-        { model: User, as: 'UsersLiked' },
-        { model: Comment, include: [User] }
-      ]
-    }).then(restaurant => {
+  getRestaurant: async (req, res) => {
+    try {
+      const restaurant = await Restaurant.findByPk(req.params.id, {
+        include: [
+          Category,
+          { model: User, as: 'FavoritedUsers' }, // 加入關聯資料: 拿到喜歡這間餐廳的 users 資料
+          { model: User, as: 'UsersLiked' },
+          { model: Comment, include: [User] }
+        ]
+      })
       // 比對將這家餐廳加到最愛的人中，是否有目前 user
       const isFavorited = restaurant.FavoritedUsers.map(user => user.id).includes(helpers.getUser(req).id)
       const isLiked = restaurant.UsersLiked.map(user => user.id).includes(helpers.getUser(req).id)
+
+      // 一進到餐廳頁面，新增 viewCounts
+      await restaurant.increment('viewCounts', { by: 1 })
 
       return res.render('restaurant', {
         restaurant: restaurant.toJSON(),
         isFavorited,
         isLiked
       })
-    })
+
+    } catch (err) {
+      console.log(err);
+    }
+
   },
   // 拿到最新動態
   getFeeds: (req, res) => {
@@ -120,9 +128,10 @@ const restController = {
     return Restaurant.findByPk(req.params.id, {
       include: [
         Category,
+        Comment,
         { model: User, as: 'FavoritedUsers' }, // 加入關聯資料: 拿到喜歡這間餐廳的 users 資料
         { model: User, as: 'UsersLiked' },
-        { model: Comment, include: [User] }
+        // { model: Comment, include: [User] }
       ]
     }).then(restaurant => {
       return res.render('dashboard', {
