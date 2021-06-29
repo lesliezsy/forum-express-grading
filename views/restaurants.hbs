@@ -27,24 +27,46 @@
   <div class="col-md-4">
     <div class="card mb-4 shadow-sm">
       <a href="/restaurants/{{this.id}}" class="text-decoration-none">
-      <img class="card-img-top" src="{{this.image}}" alt="Card image cap" width="286px" height="180px">
-       </a>
+        <img class="card-img-top" src="{{this.image}}" alt="Card image cap" width="286px" height="180px">
+      </a>
       <div class="card-body">
-        <p class="card-text">
+        <span class="card-text">
           <a href="/restaurants/{{this.id}}" class="text-decoration-none">
             {{this.name}}
           </a>
-        </p>
+        </span>
+        <br>
         <span class="badge bg-secondary">{{this.categoryName}}</span>
-        <p class="card-text">{{this.description}}</p>
-        {{!-- 按鈕上的 this.id 因位在 #each restaurants 的作用域裡，所以會取到餐廳 id --}}
-        {{#if this.isFavorited }}
-        <form action="/favorite/{{this.id}}?_method=DELETE" method="POST"><button type="submit"
-            class="btn btn-danger">移除最愛</button></form>
-        {{else}}
-        <form action="/favorite/{{this.id}}" method="POST"><button type="submit" class="btn btn-primary">加到最愛</button>
-        </form>
-        {{/if}}
+        <p class="card-text mt-1">{{this.description}}</p>
+
+        <div class="d-flex justify-content-end">
+          {{!-- 按鈕上的 this.id 因位在 #each restaurants 的作用域裡，所以會取到餐廳 id --}}
+          {{#if this.isLiked }}
+          {{!-- 反悔說讚 --}}
+          <form action="/like/{{this.id}}?_method=DELETE" method="POST">
+            <button type="submit" class="btn btn-link text-warning" data-bs-toggle="tooltip" title="Remove thumbs up"><i class="fas fa-thumbs-up"></i></button>
+          </form>
+          {{else}}
+          {{!-- 說讚 --}}
+          <form action="/like/{{this.id}}" method="POST">
+            <button type="submit" class="btn btn-link text-secondary" data-bs-toggle="tooltip" title="Thumbs up"><i class="far fa-thumbs-up"></i></button>
+          </form>
+          {{/if}}
+
+          {{#if this.isFavorited }}
+          {{!-- 移除最愛 --}}
+          <form action="/favorite/{{this.id}}?_method=DELETE" method="POST">
+            <button type="submit" class="btn btn-link text-danger" data-bs-toggle="tooltip" title="Remove from my favorite"><i class="fas fa-heart"></i></button>
+          </form>
+          {{else}}
+          {{!-- 加到最愛 --}}
+          <form action="/favorite/{{this.id}}" method="POST">
+            <button type="submit" class="btn btn-link text-secondary" data-bs-toggle="tooltip" title="Add to my favorite"><i class="far fa-heart"></i></button>
+          </form>
+          {{/if}}
+
+        </div>
+
       </div>
     </div>
   </div>

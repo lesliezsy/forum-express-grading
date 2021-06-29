@@ -1,5 +1,6 @@
 const db = require('../models')
 const { Comment } = db
+const helpers = require('../_helpers')
 
 const commentController = {
   postComment: (req, res) => {
@@ -8,7 +9,7 @@ const commentController = {
     return Comment.create({
         text,
         RestaurantId,
-        UserId: req.user.id
+        UserId: helpers.getUser(req).id
       })
       .then((comment) => {
         res.redirect(`/restaurants/${RestaurantId}`)
