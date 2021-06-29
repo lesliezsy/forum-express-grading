@@ -18,23 +18,30 @@
     <p>{{restaurant.description}}</p>
 
     <div class="d-flex ">
+
+      <a class="btn btn-secondary btn-sm" href="/restaurants/{{restaurant.id}}/dashboard" role="button">Dashboard</a>
+
       {{#if isLiked }}
       <form action="/like/{{restaurant.id}}?_method=DELETE" method="POST">
-        <button type="submit" class="btn btn-link text-warning" data-bs-toggle="tooltip" title="Thumbs down"><i class="fas fa-thumbs-up"></i></button>
+        <button type="submit" class="btn btn-link text-warning" data-bs-toggle="tooltip" title="Remove thumbs up"><i
+            class="fas fa-thumbs-up"></i></button>
       </form>
       {{else}}
       <form action="/like/{{restaurant.id}}" method="POST">
-        <button type="submit" class="btn btn-link text-secondary" data-bs-toggle="tooltip" title="Thumbs up"><i class="far fa-thumbs-down"></i></button>
+        <button type="submit" class="btn btn-link text-secondary" data-bs-toggle="tooltip" title="Thumbs up"><i
+            class="far fa-thumbs-up"></i></button>
       </form>
       {{/if}}
 
       {{#if isFavorited }}
       <form action="/favorite/{{restaurant.id}}?_method=DELETE" method="POST" style="display: contents;">
-        <button type="submit" class="btn btn-link text-danger" data-bs-toggle="tooltip" title="Remove from my favorite"><i class="fas fa-heart"></i></button>
+        <button type="submit" class="btn btn-link text-danger" data-bs-toggle="tooltip"
+          title="Remove from my favorite"><i class="fas fa-heart"></i></button>
       </form>
       {{else}}
       <form action="/favorite/{{restaurant.id}}" method="POST" style="display: contents;">
-        <button type="submit" class="btn btn-link text-secondary" data-bs-toggle="tooltip" title="Add to my favorite"><i class="far fa-heart"></i></button>
+        <button type="submit" class="btn btn-link text-secondary" data-bs-toggle="tooltip" title="Add to my favorite"><i
+            class="far fa-heart"></i></button>
       </form>
       {{/if}}
     </div>
