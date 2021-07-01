@@ -72,13 +72,13 @@ const restController = {
       const restaurant = await Restaurant.findByPk(req.params.id, {
         include: [
           Category,
-          { model: User, as: 'FavoritedUsers' }, // 加入關聯資料: 拿到喜歡這間餐廳的 users 資料
+          { model: User, as: 'UsersFavorited' }, // 加入關聯資料: 拿到喜歡這間餐廳的 users 資料
           { model: User, as: 'UsersLiked' },
           { model: Comment, include: [User] }
         ]
       })
       // 比對將這家餐廳加到最愛的人中，是否有目前 user
-      const isFavorited = restaurant.FavoritedUsers.map(user => user.id).includes(helpers.getUser(req).id)
+      const isFavorited = restaurant.UsersFavorited.map(user => user.id).includes(helpers.getUser(req).id)
       const isLiked = restaurant.UsersLiked.map(user => user.id).includes(helpers.getUser(req).id)
 
       // 一進到餐廳頁面，新增 viewCounts
@@ -129,7 +129,7 @@ const restController = {
       include: [
         Category,
         Comment,
-        { model: User, as: 'FavoritedUsers' }, // 加入關聯資料: 拿到喜歡這間餐廳的 users 資料
+        { model: User, as: 'UsersFavorited' }, // 加入關聯資料: 拿到喜歡這間餐廳的 users 資料
         { model: User, as: 'UsersLiked' },
         // { model: Comment, include: [User] }
       ]
@@ -139,5 +139,32 @@ const restController = {
       })
     })
   },
+  getTopRestaurant: async (req, res) => {
+
+    try {
+      // 取資料時，預設取出 被加入最愛 數量最多的前 10 筆資料
+      const SQLQuery = `SELECT Restaurants.id, Restaurants.name, Restaurants.image, Restaurants.description, COUNT(Restaurants.id) AS favoriteCounts FROM Restaurants
+      INNER JOIN Favorites
+      ON Restaurants.id = Favorites.RestaurantId
+      GROUP BY Restaurants.id
+      ORDER BY favoriteCounts DESC
+      LIMIT 10;`
+      
+      const results = await db.sequelize.query(SQLQuery, { raw: true, nest: true })
+      // 整理取出的餐廳資料
+      const restaurants = results.map(restaurant => ({
+        ...restaurant,
+        description: restaurant.description.substring(0, 20),
+        isFavorited: helpers.getUser(req).FavoritedRestaurants.map(d => d.id).includes(restaurant.id),
+      }))
+
+      return res.render('topRestaurant', {
+        restaurants
+      })
+
+    } catch (err) {
+      console.log(err);
+    }
+  }
 }
 module.exports = restController
