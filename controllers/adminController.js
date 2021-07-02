@@ -1,16 +1,20 @@
 const db = require('../models')
 const { Restaurant, Category, User } = db
+const adminService = require('../services/adminService')
+
 // const fs = require('fs')
 const imgur = require('imgur-node-api')
 const IMGUR_CLIENT_ID = process.env.IMGUR_CLIENT_ID
 
+// controller 去呼叫 service 提供資料
+// callback 執行時，把資料帶入data
 const adminController = {
   getRestaurants: (req, res) => {
     // 撈出資料後，需用 { raw: true, nest: true } 轉換成 JS 原生物件
-    return Restaurant.findAll({ raw: true, nest: true, include: [Category] })
-      .then(restaurants => {
-        return res.render('admin/restaurants', { restaurants })
-      })
+    adminService.getRestaurants(req, res, (data) => {
+      // 函式執行時，controller 呼叫了 view 樣板，並且把 data 傳入 view 樣板
+      return res.render('admin/restaurants', data)
+    })
   },
   createRestaurant: (req, res) => {
     Category.findAll({
