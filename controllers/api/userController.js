@@ -5,7 +5,7 @@ const { User } = db
 // JWT
 const jwt = require('jsonwebtoken')
 const passportJWT = require('passport-jwt')
-const { ExtractJwt, JwtStrategy } = passportJWT
+const { ExtractJwt, Strategy:JwtStrategy } = passportJWT
 
 const userController = {
   signIn: (req, res) => {

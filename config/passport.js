@@ -41,4 +41,30 @@ passport.deserializeUser((id, cb) => {
   })
 })
 
+// JWT
+const jwt = require('jsonwebtoken')
+const passportJWT = require('passport-jwt')
+const { ExtractJwt, Strategy:JwtStrategy } = passportJWT
+
+let jwtOptions = {}
+// 設定到哪找 token：指定 authorization header 裡的 bearer 項目
+jwtOptions.jwtFromRequest = ExtractJwt.fromAuthHeaderAsBearerToken()
+// 使用密鑰檢查 token 是否經過纂改
+jwtOptions.secretOrKey = process.env.JWT_SECRET
+
+let strategy = new JwtStrategy(jwtOptions, function (jwt_payload, next) {
+  User.findByPk(jwt_payload.id, {
+    include: [
+      { model: db.Restaurant, as: 'FavoritedRestaurants' },
+      { model: db.Restaurant, as: 'LikedRestaurants' },
+      { model: User, as: 'Followers' },
+      { model: User, as: 'Followings' }
+    ]
+  }).then(user => {
+    if (!user) return next(null, false)
+    return next(null, user)
+  })
+})
+passport.use(strategy)
+
 module.exports = passport
