@@ -9,7 +9,7 @@ if (process.env.NODE_ENV !== 'production') {
 
 const app = express()
 const port = process.env.PORT || 3000
-const { urlencoded } = require('body-parser')
+// const { urlencoded } = require('body-parser')
 const flash = require('connect-flash')
 const session = require('express-session')
 const passport = require('./config/passport')
@@ -22,7 +22,9 @@ app.engine('hbs', exphbs({
 })) // Handlebars 註冊樣板引擎
 app.set('view engine', 'hbs') // 設定使用 Handlebars 做為樣板引擎
 
-app.use(urlencoded({ extended: true }))
+// app.use(urlencoded({ extended: true }))
+app.use(express.urlencoded({extended: true}));
+app.use(express.json()) 
 app.use(session({ secret: 'secret', resave: false, saveUninitialized: false }))
 app.use(passport.initialize())
 app.use(passport.session())

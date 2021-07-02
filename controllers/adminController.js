@@ -33,52 +33,14 @@ const adminController = {
     })
   },
   postRestaurant: (req, res) => {
-    // 餐廳名稱為必填，沒填的話會導回去新增餐廳的頁面
-    if (!req.body.name) {
-      req.flash('error_messages', "Name is required.")
-      return res.redirect('back')
-    }
-    const { file } = req // 從網頁傳來的req裡的 file（is a obj）專放圖片，body（is a obj）放文字內容
-    // 若存在圖片類型檔案
-    if (file) {
-      // 將圖檔直接上傳至 imgur
-      imgur.setClientID(IMGUR_CLIENT_ID);
-      imgur.upload(file.path, (err, img) => {
-
-        // fs.readFile(file.path, (err, data) => {
-        //   if (err) console.log('Error: ', err) // 上傳失誤 
-        //   // 將圖檔正式寫入 upload 資料夾
-        //   fs.writeFile(`upload/${file.originalname}`, data, () => {
-        //     console.log("上傳的圖片： ", file);
-        return Restaurant.create({
-          name: req.body.name,
-          tel: req.body.tel,
-          address: req.body.address,
-          opening_hours: req.body.opening_hours,
-          description: req.body.description,
-          image: file ? img.data.link : null,
-          // image: file ? `/upload/${file.originalname}` : null
-          CategoryId: req.body.categoryId
-        }).then((restaurant) => {
-          req.flash('success_messages', 'Restaurant was successfully created.')
-          return res.redirect('/admin/restaurants')
-        })
-        // })
-      })
-    } else { // 若不存在圖檔
-      return Restaurant.create({
-        name: req.body.name,
-        tel: req.body.tel,
-        address: req.body.address,
-        opening_hours: req.body.opening_hours,
-        description: req.body.description,
-        image: null,
-        CategoryId: req.body.categoryId
-      }).then((restaurant) => {
-        req.flash('success_messages', 'Restaurant was successfully created.')
-        return res.redirect('/admin/restaurants')
-      })
-    }
+    adminService.postRestaurant(req, res, (data) => {
+      if (data.status === 'error') {
+        req.flash('error_messages', data.message)
+        return res.redirect('back')
+      }
+      req.flash('success_messages', data.message)
+      res.redirect('/admin/restaurants')
+    })
   },
   editRestaurant: (req, res) => {
     Category.findAll({

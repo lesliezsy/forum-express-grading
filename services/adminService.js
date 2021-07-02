@@ -2,6 +2,9 @@
 const db = require('../models')
 const { Restaurant, Category } = db
 
+const imgur = require('imgur-node-api')
+const IMGUR_CLIENT_ID = process.env.IMGUR_CLIENT_ID
+
 // service 取資料、整理資料
 // 預備好資料後，執行 callback，把資料傳入 controller 函式中的 data
 const adminService = {
@@ -30,7 +33,54 @@ const adminService = {
     } catch (err) {
       console.log(err);
     }
-  }
+  },
+  postRestaurant: async (req, res, callback) => {
+    // 餐廳名稱為必填，沒填的話會導回去新增餐廳的頁面
+    if (!req.body.name) return callback({ status: 'error', message: "Name is required." })
+
+    try {
+      const { file } = req // 從網頁傳來的req裡的 file（is a obj）專放圖片，body（is a obj）放文字內容
+      // 若存在圖片類型檔案
+      if (file) {
+        // fs.readFile(file.path, (err, data) => {
+        //   if (err) console.log('Error: ', err) // 上傳失誤 
+        //   // 將圖檔正式寫入 upload 資料夾
+        //   fs.writeFile(`upload/${file.originalname}`, data, () => {
+        //     console.log("上傳的圖片： ", file);
+
+        // 將圖檔直接上傳至 imgur
+        imgur.setClientID(IMGUR_CLIENT_ID);
+        imgur.upload(file.path, async (err, img) => {
+          const restaurant = await Restaurant.create({
+            name: req.body.name,
+            tel: req.body.tel,
+            address: req.body.address,
+            opening_hours: req.body.opening_hours,
+            description: req.body.description,
+            image: file ? img.data.link : null,
+            // image: file ? `/upload/${file.originalname}` : null
+            CategoryId: req.body.categoryId
+          })
+          callback({ status: 'success', message: 'Restaurant was successfully created.' })
+          // })
+        })
+
+      } else { // 若不存在圖檔
+        const restaurant = await Restaurant.create({
+          name: req.body.name,
+          tel: req.body.tel,
+          address: req.body.address,
+          opening_hours: req.body.opening_hours,
+          description: req.body.description,
+          image: null,
+          CategoryId: req.body.categoryId
+        })
+        callback({ status: 'success', message: 'Restaurant was successfully created.' })
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  },
 }
 
 module.exports = adminService
