@@ -1,8 +1,11 @@
-const adminService = require('../../services/adminService')
+const db = require('../../models')
+const { Category } = db
+
+const categoryService = require('../../services/categoryService')
 
 const categoryController = {
   getCategories: (req, res) => {
-    adminService.getCategories(req, res, (data) => {
+    categoryService.getCategories(req, res, (data) => {
       return res.json(data)
     })
   },

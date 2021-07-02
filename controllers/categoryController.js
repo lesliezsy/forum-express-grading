@@ -1,10 +1,10 @@
 const db = require('../models')
 const { Category } = db
-const adminService = require('../services/adminService')
+const categoryService = require('../services/categoryService')
 
 let categoryController = {
   getCategories: (req, res) => {
-    adminService.getCategories(req, res, (data) => {
+    categoryService.getCategories(req, res, (data) => {
       // 函式執行時，controller 呼叫了 view 樣板，並且把 data 傳入 view 樣板
       return res.render('admin/categories', data)
     })
