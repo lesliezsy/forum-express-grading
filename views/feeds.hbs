@@ -1,4 +1,4 @@
-<ul class="nav nav-tabs mb-2">
+<ul class="nav nav-tabs mb-3">
   <li class="nav-item">
     <a class="nav-link" href="/restaurants">首頁</a>
   </li>
@@ -13,7 +13,7 @@
   </li>
 </ul>
 
-<h1>最新動態</h1>
+<h4>最新動態</h4>
 <hr />
 <div class="row">
   <div class="col-md-6">
@@ -24,12 +24,12 @@
       <div class="card-body">
         {{#each restaurants}}
         <div>
-          <h4>
-            <a href="/restaurants/{{this.id}}">{{this.name}}</a>
-            <small>{{this.Category.name}}</small>
-          </h4>
+          <h6>
+            <a class="text-decoration-none" href="/restaurants/{{this.id}}">{{this.name}}</a>
+            <small class="badge bg-secondary">{{this.Category.name}}</small>
+          </h6>
           <p>{{this.description}}</p>
-          {{moment this.createdAt}}
+          <span class="text-muted"> {{moment this.createdAt}} </span>
           <hr>
         </div>
         {{/each}}
@@ -44,12 +44,13 @@
       <div class="card-body">
         {{#each comments}}
         <div>
-          <h4>
-            <a href="/restaurants/{{this.Restaurant.id}}">{{this.Restaurant.name}}</a>
-          </h4>
+          <h6>
+            <a class="text-decoration-none" href="/restaurants/{{this.Restaurant.id}}">{{this.Restaurant.name}}</a>
+          </h6>
           <p>{{this.text}}</p>
-          by <a href="/users/{{this.User.id}}">{{this.User.name}}</a>
-          at {{moment this.createdAt}}
+          <span class="text-muted"> by <a class="text-decoration-none"
+              href="/users/{{this.User.id}}">{{this.User.name}}</a>
+            at {{moment this.createdAt}} </span>
           <hr>
         </div>
         {{/each}}
