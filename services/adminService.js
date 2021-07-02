@@ -12,7 +12,16 @@ const adminService = {
     } catch (err) {
       console.log(err);
     }
-  }
+  },
+  getRestaurant: async (req, res, callback) => {
+    try {
+      const restaurant = await Restaurant.findByPk(req.params.id, { include: [Category] })
+      // 只處理單筆資料時，用 .toJSON() 把 Sequelize 回傳的整包物件直接轉成 JSON 格式
+      callback({ restaurant })
+    } catch (err) {
+      console.log(err);
+    }
+  },
 }
 
 module.exports = adminService

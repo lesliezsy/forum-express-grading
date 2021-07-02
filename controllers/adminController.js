@@ -16,6 +16,12 @@ const adminController = {
       return res.render('admin/restaurants', data)
     })
   },
+  // 瀏覽單一餐廳
+  getRestaurant: (req, res) => {
+    adminService.getRestaurant(req, res, (data) => {
+      return res.render('admin/restaurant', data)
+    })
+  },
   createRestaurant: (req, res) => {
     Category.findAll({
       raw: true,
@@ -73,14 +79,6 @@ const adminController = {
         return res.redirect('/admin/restaurants')
       })
     }
-  },
-  // 瀏覽單一餐廳
-  getRestaurant: (req, res) => {
-    return Restaurant.findByPk(req.params.id, { include: [Category] })
-      .then(restaurant => {
-        // 只處理單筆資料時，用 .toJSON() 把 Sequelize 回傳的整包物件直接轉成 JSON 格式
-        return res.render('admin/restaurant', { restaurant: restaurant.toJSON() })
-      })
   },
   editRestaurant: (req, res) => {
     Category.findAll({
