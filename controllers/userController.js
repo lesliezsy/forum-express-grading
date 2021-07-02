@@ -47,27 +47,32 @@ const userController = {
     req.logout()
     res.redirect('/signin')
   },
-  getUser: (req, res) => {
-    // 找到 user info 以及 他的評論 傳到前端
-    // 透過評論，利用 RestaurantId 去找到 Restaurant info
-    User.findByPk(req.params.id, {
+  getUser: async (req, res) => {
+    try {
+      // 找到 user info 以及 他的評論 傳到前端。透過評論，利用 RestaurantId 去找到 Restaurant info
+      const user = await User.findByPk(req.params.id, {
         include: [{
-          model: Comment,
-          include: [{
-            model: Restaurant,
-            attributes: ['id', 'name', 'image'],
-          }],
-          order: [
-            ['createdAt', 'DESC']
-          ], // 按照評論產生時間新到舊排序
-        }],
+            model: Comment,
+            include: [{
+              model: Restaurant,
+              attributes: ['id', 'name', 'image'],
+            }],
+            order: [
+              ['createdAt', 'DESC']
+            ], // 按照評論產生時間新到舊排序
+          }, 
+          { model: User, as: 'Followers' },
+          { model: User, as: 'Followings' },
+          { model: Restaurant, as: 'FavoritedRestaurants' }
+        ],
       })
-      .then((user) => {
-        return res.render('profile', {
-          user: user.toJSON(),
-          self: helpers.getUser(req).id
-        })
+      return res.render('profile', {
+        user: user.toJSON(),
+        self: helpers.getUser(req).id
       })
+    } catch (err) {
+      console.log(err);
+    }
   },
   editUser: (req, res) => {
     User.findOne({
