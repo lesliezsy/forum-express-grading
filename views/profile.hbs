@@ -9,7 +9,12 @@
       <div class="card-body">
         <h5 class="card-title">{{user.name}}</h5>
         <p class="card-text">{{user.email}}</p>
-        <p> {{user.Comments.length}} 筆餐廳評論</p>
+
+        <span> Comment: {{user.Comments.length}} </span>
+        <p class="mb-0"> Favorite Restaurant: {{user.FavoritedRestaurants.length}}</p>
+        <span> Following: {{user.Followings.length}} </span>
+        <p> Follower: {{user.Followers.length}} </p>
+
         {{#ifCond user.id self}}
         <a class="btn btn-primary" href="/users/{{user.id}}/edit" role="button">Edit</a>
         {{/ifCond}}
@@ -18,21 +23,68 @@
   </div>
 </div>
 
-<div class="card text-start mt-4">
-  <div class="card-header">
-    {{user.Comments.length}} 筆餐廳評論
-  </div>
-  <div class="card-body row d-flex justify-content-around">
+<div class="row g-0 mt-4 justify-content-between">
 
-    {{#each user.Comments}}
-    <div class="card col-4 col-sm-3 mb-2 mr-3" style="width: 10rem;">
-      <a href="/restaurants/{{this.Restaurant.id}}" class="text-decoration-none" data-bs-toggle="tooltip" title="{{this.Restaurant.name}}">
-        <div class="card-body py-1 px-1 text-center">
-          <img src="{{this.Restaurant.image}}" class="rounded img-fluid" style="object-fit: cover;">
-        </div>
-      </a>
+  <div class="card text-start col-4">
+    <div class="card-header">
+      Following
     </div>
-    {{/each}}
+    <div class="card-body row">
+      {{#each user.Followings}}
+      <div class="rounded col-12 col-md-6 d-flex mb-2" data-bs-toggle="tooltip" title="{{this.name}}">
+        <a href="/users/{{this.id}}" class="text-decoration-none">
+          <img src="{{this.image}}" class="img-thumbnail" style="width:100px; height: 100px; object-fit: cover">
+        </a>
+      </div>
+      {{/each}}
+    </div>
+  </div>
+
+  <div class="card text-start col-7">
+    <div class="card-header">
+      Comment
+    </div>
+    <div class="card-body row">
+        {{#each user.Comments}}
+        <div class="rounded col-6 col-md-3 d-flex mb-2" data-bs-toggle="tooltip" title="{{this.Restaurant.name}}">
+          <a href="/restaurants/{{this.Restaurant.id}}" class="text-decoration-none">
+            <img src="{{this.Restaurant.image}}" class="img-thumbnail" style="width:100px; height: 100px; object-fit: cover">
+          </a>
+        </div>
+        {{/each}}
+    </div>
 
   </div>
+
+  <div class="card text-start col-4">
+    <div class="card-header">
+      Follower
+    </div>
+    <div class="card-body row">
+      {{#each user.Followers}}
+      <div class="rounded col-12 col-md-6 d-flex mb-2" data-bs-toggle="tooltip" title="{{this.name}}">
+        <a href="/users/{{this.id}}" class="text-decoration-none">
+          <img src="{{this.image}}" class="img-thumbnail" style="width:100px; height: 100px; object-fit: cover">
+        </a>
+      </div>
+      {{/each}}
+    </div>
+  </div>
+
+  <div class="card text-start col-7">
+    <div class="card-header">
+      Favorite Restaurant
+    </div>
+    <div class="card-body row">
+      {{#each user.FavoritedRestaurants}}
+      <div class="rounded col-6 col-md-3 d-flex mb-2" data-bs-toggle="tooltip" title="{{this.name}}">
+        <a href="/restaurants/{{this.id}}" class="text-decoration-none">
+          <img src="{{this.image}}" class="img-thumbnail" style="width:100px; height: 100px; object-fit: cover">
+        </a>
+      </div>
+      {{/each}}
+
+    </div>
+  </div>
+
 </div>
