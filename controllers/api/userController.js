@@ -2,16 +2,9 @@ const bcrypt = require('bcryptjs')
 const db = require('../../models')
 const { User } = db
 
-// JWT
-const jwt = require('jsonwebtoken')
-const passportJWT = require('passport-jwt')
-const { ExtractJwt, Strategy:JwtStrategy } = passportJWT
-
 const userController = {
   signIn: (req, res) => {
-
     let { email: username, password } = req.body
-
     // 檢查必要資料
     if (!username || !password) {
       return res.json({ status: 'error', message: "Required fields didn't exist" })
@@ -38,7 +31,26 @@ const userController = {
         }
       })
     })
-  }
+  },
+  signUp: (req, res) => {
+    if(req.body.passwordCheck !== req.body.password){
+      return res.json({ status: 'error', message: 'Passwords do NOT match.'})
+    } else {
+      User.findOne({where: {email: req.body.email}}).then(user => {
+        if(user){
+          return res.json({ status: 'error', message: 'This email already exists.'})
+        } else {
+          User.create({
+            name: req.body.name,
+            email: req.body.email,
+            password: bcrypt.hashSync(req.body.password, bcrypt.genSaltSync(10), null)
+          }).then(user => {
+            return res.json({ status: 'success', message: 'Registered successfully.'})
+          })  
+        }
+      })    
+    }
+  },
 }
 
 module.exports = userController
