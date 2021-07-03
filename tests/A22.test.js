@@ -22,10 +22,10 @@ describe('# A22: TOP 10 人氣餐廳 ', function() {
         helpers, 'getUser'
       ).returns({id: 1, Followings: [], FavoritedRestaurants: []});
 
-      await db.User.destroy({where: {},truncate: true})
-      await db.Category.destroy({where: {},truncate: true})
-      await db.Restaurant.destroy({where: {},truncate: true})
-      await db.Favorite.destroy({where: {},truncate: true})
+      await db.User.destroy({where: {},truncate: { cascade: true }})
+      await db.Category.destroy({where: {},truncate: { cascade: true }})
+      await db.Restaurant.destroy({where: {},truncate: { cascade: true }})
+      await db.Favorite.destroy({where: {},truncate: { cascade: true }})
       await db.User.create({name: 'User1'})
       await db.User.create({name: 'User2'})
       await db.Restaurant.create({
@@ -70,7 +70,7 @@ describe('# A22: TOP 10 人氣餐廳 ', function() {
     after(async () => {
       this.ensureAuthenticated.restore();
       this.getUser.restore();
-      await db.User.destroy({where: {},truncate: true})
+      await db.User.destroy({where: {},truncate: { cascade: true }})
     })
 
   })
@@ -84,10 +84,10 @@ describe('# A22: TOP 10 人氣餐廳 ', function() {
         helpers, 'getUser'
       ).returns({id: 1, Followings: [], FavoritedRestaurants: []});
 
-      await db.User.destroy({where: {},truncate: true})
-      await db.Category.destroy({where: {},truncate: true})
-      await db.Restaurant.destroy({where: {},truncate: true})
-      await db.Favorite.destroy({where: {},truncate: true})
+      await db.User.destroy({where: {},truncate: { cascade: true }})
+      await db.Category.destroy({where: {},truncate: { cascade: true }})
+      await db.Restaurant.destroy({where: {},truncate: { cascade: true }})
+      await db.Favorite.destroy({where: {},truncate: { cascade: true }})
       await db.User.create({name: 'User1'})
       await db.User.create({name: 'User2'})
       await db.Restaurant.create({
@@ -142,7 +142,7 @@ describe('# A22: TOP 10 人氣餐廳 ', function() {
     after(async () => {
       this.ensureAuthenticated.restore();
       this.getUser.restore();
-      await db.User.destroy({where: {},truncate: true})
+      await db.User.destroy({where: {},truncate: { cascade: true }})
     })
 
   })
