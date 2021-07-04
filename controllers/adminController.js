@@ -19,6 +19,7 @@ const adminController = {
   // 瀏覽單一餐廳
   getRestaurant: (req, res) => {
     adminService.getRestaurant(req, res, (data) => {
+      console.log("餐廳： ", data);
       return res.render('admin/restaurant', data)
     })
   },
@@ -57,55 +58,14 @@ const adminController = {
   },
   // 更新編輯的餐廳資料
   putRestaurant: (req, res) => {
-    if (!req.body.name) {
-      req.flash('error_messages', "Name is required.")
-      return res.redirect('back')
-    }
-
-    const { file } = req
-    if (file) {
-      // 將圖檔直接上傳至 imgur，成功後，http://img.data.link/ 會是剛剛上傳後拿到的圖片網址
-      imgur.setClientID(IMGUR_CLIENT_ID);
-      imgur.upload(file.path, (err, img) => {
-        // fs.readFile(file.path, (err, data) => {
-        //   if (err) console.log('Error: ', err)
-        //   fs.writeFile(`upload/${file.originalname}`, data, () => {
-        return Restaurant.findByPk(req.params.id)
-          .then((restaurant) => {
-            restaurant.update({
-              name: req.body.name,
-              tel: req.body.tel,
-              address: req.body.address,
-              opening_hours: req.body.opening_hours,
-              description: req.body.description,
-              image: file ? img.data.link : restaurant.image,
-              // image: file ? `/upload/${file.originalname}` : restaurant.image
-              CategoryId: req.body.categoryId
-            }).then((restaurant) => {
-              req.flash('success_messages', 'Restaurant was updated successfully.')
-              res.redirect('/admin/restaurants')
-            })
-          })
-        // })
-      })
-    } else {
-      return Restaurant.findByPk(req.params.id)
-        .then((restaurant) => {
-          restaurant.update({
-              name: req.body.name,
-              tel: req.body.tel,
-              address: req.body.address,
-              opening_hours: req.body.opening_hours,
-              description: req.body.description,
-              image: restaurant.image,
-              CategoryId: req.body.categoryId
-            })
-            .then((restaurant) => {
-              req.flash('success_messages', 'Restaurant was updated successfully.')
-              res.redirect('/admin/restaurants')
-            })
-        })
-    }
+    adminService.putRestaurant(req, res, (data) => {
+      if (data.status === 'error') {
+        req.flash('error_messages', data.message)
+        return res.redirect('back')
+      }
+      req.flash('success_messages', data.message)
+      res.redirect('/admin/restaurants')
+    })
   },
   deleteRestaurant: (req, res) => {
     adminService.deleteRestaurant(req, res, (data) => {

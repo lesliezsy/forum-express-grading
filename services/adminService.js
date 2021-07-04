@@ -46,7 +46,6 @@ const adminService = {
         //   if (err) console.log('Error: ', err) // 上傳失誤 
         //   // 將圖檔正式寫入 upload 資料夾
         //   fs.writeFile(`upload/${file.originalname}`, data, () => {
-        //     console.log("上傳的圖片： ", file);
 
         // 將圖檔直接上傳至 imgur
         imgur.setClientID(IMGUR_CLIENT_ID);
@@ -79,6 +78,40 @@ const adminService = {
       }
     } catch (err) {
       console.log(err);
+    }
+  },
+  putRestaurant: async (req, res, callback) => {
+    if (!req.body.name) return callback({ status: 'error', message: "Name is required." })
+
+    const { file } = req
+    if (file) {
+      // 將圖檔直接上傳至 imgur，成功後，http://img.data.link/ 會是剛剛上傳後拿到的圖片網址
+      imgur.setClientID(IMGUR_CLIENT_ID);
+      imgur.upload(file.path, async (err, img) => {
+        const restaurant = Restaurant.findByPk(req.params.id)
+        restaurant.update({
+          name: req.body.name,
+          tel: req.body.tel,
+          address: req.body.address,
+          opening_hours: req.body.opening_hours,
+          description: req.body.description,
+          image: file ? img.data.link : restaurant.image,
+          CategoryId: req.body.categoryId
+        })
+        callback({ status: 'success', message: 'Restaurant was updated successfully.' })
+      })
+    } else {
+      const restaurant = await Restaurant.findByPk(req.params.id)
+      await restaurant.update({
+        name: req.body.name,
+        tel: req.body.tel,
+        address: req.body.address,
+        opening_hours: req.body.opening_hours,
+        description: req.body.description,
+        image: restaurant.image,
+        CategoryId: req.body.categoryId
+      })
+      callback({ status: 'success', message: 'Restaurant was updated successfully.' })
     }
   },
 }
