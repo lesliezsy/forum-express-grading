@@ -25,6 +25,17 @@ const adminService = {
       console.log(err);
     }
   },
+  createRestaurant: async (req, res, callback) => {
+    try {
+      const categories = await Category.findAll({
+        raw: true,
+        nest: true
+      })
+      callback({ categories })
+    } catch (err) {
+      console.log(err);
+    }
+  },
   deleteRestaurant: async (req, res, callback) => {
     try {
       const restaurant = await Restaurant.findByPk(req.params.id)
@@ -88,8 +99,8 @@ const adminService = {
       // 將圖檔直接上傳至 imgur，成功後，http://img.data.link/ 會是剛剛上傳後拿到的圖片網址
       imgur.setClientID(IMGUR_CLIENT_ID);
       imgur.upload(file.path, async (err, img) => {
-        const restaurant = Restaurant.findByPk(req.params.id)
-        restaurant.update({
+        const restaurant = await Restaurant.findByPk(req.params.id)
+        await restaurant.update({
           name: req.body.name,
           tel: req.body.tel,
           address: req.body.address,

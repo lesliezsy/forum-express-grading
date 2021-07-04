@@ -19,18 +19,12 @@ const adminController = {
   // 瀏覽單一餐廳
   getRestaurant: (req, res) => {
     adminService.getRestaurant(req, res, (data) => {
-      console.log("餐廳： ", data);
       return res.render('admin/restaurant', data)
     })
   },
   createRestaurant: (req, res) => {
-    Category.findAll({
-      raw: true,
-      nest: true
-    }).then(categories => {
-      return res.render('admin/create', {
-        categories
-      })
+    adminService.createRestaurant(req, res, (data) => {
+      return res.render('admin/create', data)
     })
   },
   postRestaurant: (req, res) => {
