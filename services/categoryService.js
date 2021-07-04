@@ -35,11 +35,21 @@ let categoryService = {
       } else {
         const category = await Category.findByPk(req.params.id)
         await category.update(req.body)
-        callback({ status: 'success', message: 'Changed successfully.' })
+        callback({ status: 'success', message: 'Category changed successfully.' })
       }
     } catch (err) {
       console.log(err);
     }
   },
+  deleteCategory: async (req, res, callback) => {
+    try {
+      const category = await Category.findByPk(req.params.id)
+      await category.destroy()
+      callback({ status: 'success', message: 'Category deleted successfully.' })
+    } catch (err) {
+      console.log(err);
+      callback({ status: 'error', message: 'Category deleted unsuccessfully.' })
+    }
+  }
 }
 module.exports = categoryService
