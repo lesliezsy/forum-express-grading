@@ -32,7 +32,7 @@ router.put('/admin/restaurants/:id', upload.single('image'), authenticated, auth
 router.delete('/admin/restaurants/:id', authenticated, authenticatedAdmin, adminController.deleteRestaurant)
 
 router.get('/admin/categories', authenticated, authenticatedAdmin, categoryController.getCategories)
-// router.post('/admin/categories', authenticated, authenticatedAdmin, categoryController.postCategory)
+router.post('/admin/categories', authenticated, authenticatedAdmin, categoryController.postCategory)
 // router.put('/admin/categories/:id', authenticated, authenticatedAdmin, categoryController.putCategory)
 // router.delete('/admin/categories/:id', authenticated, authenticatedAdmin, categoryController.deleteCategory)
 
